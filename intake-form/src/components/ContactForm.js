@@ -20,6 +20,7 @@ const ContactForm = (props) => {
 		});
 	};
 
+
 	const submitForm = (event) => {
 		event.preventDefault();
 		console.log(contactPerson);
@@ -33,7 +34,7 @@ const ContactForm = (props) => {
 
 	return (
 		<>
-			<Form onSubmit={submitForm}>
+			<Form onSubmit={submitForm} className="contact-form-container">
 				<FormGroup>
 					<Label for="name">Name</Label>
 					<Input
@@ -69,27 +70,27 @@ const ContactForm = (props) => {
 				</FormGroup>
 				<FormGroup check>
 					<Label check>
-						<Input
+						<Input 
 							type="checkbox"
 							name="emailConsent"
 							id="emailConsent"
 							onChange={changeHandler}
-						/> {' '}
+						/>
+						I agree to be contacted via email.
 					</Label>
-					I agree to be contacted via email.
 				</FormGroup>
-				<Button
-					type="submit"
-					className="contact-form-btn"
-				>
-					Submit
-				</Button>
 				<Button
 					type="clear"
 					className="contact-form-btn"
 					onClick={clearForm}
 				>
 					Clear
+				</Button>
+				<Button
+					type="submit"
+					className="contact-form-btn"
+				>
+					Submit
 				</Button>
 			</Form>
 		</>
