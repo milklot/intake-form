@@ -58,15 +58,14 @@ const ContactForm = () => {
 	const submitForm = (event) => {
 		event.preventDefault();
 		setSuccessMessage(!successMessage)
-		// console.log(contactPerson);
 		axios.post("https://my-json-server.typicode.com/JustUtahCoders/interview-users-api/users", contactPerson)
 			.then((res) => {
-				console.log(res.data)
+				//console.log(res.data)
 				setContactPerson(initialState);
 			})
 			.catch((err) => {
 				setPostErrorMessage(!postErrorMessage);
-				console.log(err);
+				// console.log(err);
 			})
 	};
 
