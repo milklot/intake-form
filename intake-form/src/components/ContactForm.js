@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import * as yup from "yup";
 import { Button, Form, FormGroup, Label, Input, Alert } from "reactstrap";
+import axios from "axios";
 
 import formSchema from "../validation/formSchema";
 
@@ -24,6 +25,7 @@ const ContactForm = () => {
 	const [contactFormErrors, setContactFormErrors] = useState(initialFormErrors);
 	const [isDisabled, setIsDisabled] = useState(true);
 	const [successMessage, setSuccessMessage] = useState(false)
+	const [postErrorMessage, setPostErrorMessage] = useState(false)
 
 	const inputChange = (name, value) => {
 		yup
@@ -56,7 +58,16 @@ const ContactForm = () => {
 	const submitForm = (event) => {
 		event.preventDefault();
 		setSuccessMessage(!successMessage)
-		console.log(contactPerson);
+		// console.log(contactPerson);
+		axios.post("https://my-json-server.typicode.com/JustUtahCoders/interview-users-api/users", contactPerson)
+			.then((res) => {
+				console.log(res.data)
+				setContactPerson(initialState);
+			})
+			.catch((err) => {
+				setPostErrorMessage(!postErrorMessage);
+				console.log(err);
+			})
 	};
 
 	const clearForm = (event) => {
@@ -152,6 +163,13 @@ const ContactForm = () => {
 				color="success"
 			>
 			Thank you for filling the form. We will contact you very soon!
+			</Alert>}
+			{!postErrorMessage ? null :
+			<Alert 
+				className="post-error-message-container"
+				color="danger"
+			>
+			Something went wrong with for submit. Please try again.
 			</Alert>}
 		</>
 	);
