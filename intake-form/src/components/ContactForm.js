@@ -1,6 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import * as yup from "yup";
+import { Button, Form, FormGroup, Label, Input, Alert } from "reactstrap";
 
-import { Button, Form, FormGroup, Label, Input } from "reactstrap";
+import formSchema from "../validation/formSchema";
 
 const initialState = {
 	name: "",
@@ -9,20 +11,51 @@ const initialState = {
 	emailConsent: false,
 };
 
-const ContactForm = (props) => {
+const initialFormErrors = {
+	name: "",
+	email: "",
+	birthDate: "",
+	emailConsent: "",
+};
+
+const ContactForm = () => {
 
 	const [contactPerson, setContactPerson] = useState(initialState);
+	const [contactFormErrors, setContactFormErrors] = useState(initialFormErrors);
+	const [isDisabled, setIsDisabled] = useState(true);
+	const [successMessage, setSuccessMessage] = useState(false)
 
-	const changeHandler = (event) => {
+	const inputChange = (name, value) => {
+		yup
+			.reach(formSchema, name)
+			.validate(value)
+			.then(() => {
+				setContactFormErrors({
+					...contactFormErrors,
+					[name]: "",
+				});
+			})
+			.catch((err) => {
+				setContactFormErrors({
+					...contactFormErrors,
+					[name]: err.errors[0]
+				});
+			});
 		setContactPerson({
 			...contactPerson,
-			[event.target.name]: event.target.value
-		});
-	};
+			[name]: value
+		})
+	} ;
 
+	const changeHandler = (event) => {
+		const { name , value, type, checked} = event.target;
+		 const valueToUse = type === "checkbox" ? checked : value;
+		inputChange(name, valueToUse);
+	};
 
 	const submitForm = (event) => {
 		event.preventDefault();
+		setSuccessMessage(!successMessage)
 		console.log(contactPerson);
 	};
 
@@ -31,10 +64,15 @@ const ContactForm = (props) => {
 		setContactPerson(initialState)
 	};
 
+	useEffect(() => {
+		formSchema.isValid(contactPerson)
+			.then((isValid) => setIsDisabled(!isValid), [contactPerson])
+	})
 
 	return (
 		<>
 			<Form onSubmit={submitForm} className="contact-form-container">
+				<h2 className="contact-h2">Contact us</h2>
 				<FormGroup>
 					<Label for="name">Name</Label>
 					<Input
@@ -44,6 +82,8 @@ const ContactForm = (props) => {
 						placeholder="enter your name"
 						value={contactPerson.name}
 						onChange={changeHandler}
+						required
+						
 					/>
 				</FormGroup>
 				<FormGroup>
@@ -55,6 +95,8 @@ const ContactForm = (props) => {
 						placeholder="enter your email"
 						value={contactPerson.email}
 						onChange={changeHandler}
+						required
+						
 					/>
 				</FormGroup>
 				<FormGroup>
@@ -75,6 +117,9 @@ const ContactForm = (props) => {
 							name="emailConsent"
 							id="emailConsent"
 							onChange={changeHandler}
+							checked={contactPerson.emailConsent}
+							onClick={console.log(contactPerson.emailConsent)}
+							required
 						/>
 						I agree to be contacted via email.
 					</Label>
@@ -89,10 +134,25 @@ const ContactForm = (props) => {
 				<Button
 					type="submit"
 					className="contact-form-btn"
+					color="primary"
+					disabled={isDisabled}
 				>
 					Submit
 				</Button>
-			</Form>
+				<div className="error-message-container">
+					<p>{contactFormErrors.name}</p>
+					<p>{contactFormErrors.email}</p>
+					<p>{contactFormErrors.birthDate}</p>
+					<p>{contactFormErrors.emailConsent}</p>
+				</div>
+			</Form> 
+			{!successMessage ? null :
+			<Alert 
+				className="success-message-container"
+				color="success"
+			>
+			Thank you for filling the form. We will contact you very soon!
+			</Alert>}
 		</>
 	);
 };
